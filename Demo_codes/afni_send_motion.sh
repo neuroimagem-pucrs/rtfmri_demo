@@ -1,8 +1,8 @@
 
-#!/bin/tcsh
+#!/bin/bash
 
-set motion_data = $1
+motion_data=with_movement
 
 cd data
 
-cp ${motion_data} ../Send/images/EPI_run
+cp -r ${motion_data} ../Send/images/EPI_run/
