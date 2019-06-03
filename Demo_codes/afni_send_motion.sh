@@ -1,5 +1,5 @@
 
-#!/bin/tcsh
+#!/bin/bash
 
 set motion_data = $1
 
