@@ -1,7 +1,7 @@
 
 #!/bin/bash
 
-motion_data=with_movement
+motion_data=$1
 
 cd data
 
