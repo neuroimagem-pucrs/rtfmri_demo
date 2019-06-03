@@ -1,0 +1,6 @@
+#!/bin/tcsh
+
+#realtime_receiver.py -show_data yes	\
+#	-show_demo_gui yes -data_choice diff_ratio
+
+realtime_receiver.py -data_choice motion_norm -show_data yes -show_demo_gui yes -verb 15

@@ -1,0 +1,3 @@
+#!/bin/tcsh
+
+lib_image_control.py
