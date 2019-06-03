@@ -1,7 +1,7 @@
 
 #!/bin/bash
 
-set motion_data = $1
+motion_data=$1
 
 cd data
 
