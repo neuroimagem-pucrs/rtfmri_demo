@@ -442,7 +442,7 @@ class CanvasFrame(wx.Frame):
          if self.ACCmotionstatus < 26:
              self.rectangleACC.set_y(self.ACCmotionstatus/20.0)
              
-             if self.ACCmotionstatus > self.NMotion:
+             if self.ACCmotionstatus >= self.NMotion and self.TRNumber <= 30:
                  self.MotionDetected = 1
 
       #else: 
@@ -469,11 +469,13 @@ class CanvasFrame(wx.Frame):
           print '-- Euclidean Motion: %f' % self.adata.mat[0][1]
           self.plot_data(self.eucMotion)
 
-      if self.TRNumber == 37 and self.motiondetectionacc < (self.TRESHOLDRT*17):
+#      if self.TRNumber == 30 and self.motiondetectionacc < (self.TRESHOLDRT*17):
+      if self.TRNumber == 30 and self.ACCmotionstatus < self.NMotion:
          self.NMotionsConfig.set_text('Head motion trend: PASS')
-      elif self.TRNumber == 37 and self.motiondetectionacc > (self.TRESHOLDRT*17):
+#      elif self.TRNumber == 30 and self.motiondetectionacc > (self.TRESHOLDRT*17):
+      elif self.TRNumber <= 30 and self.ACCmotionstatus > self.NMotion:
          self.NMotionsConfig.set_text('Head motion trend: FAIL')
-      elif self.TRNumber < 37:
+      elif self.TRNumber < 30:
          self.NMotionsConfig.set_text('Head motion trend: Analyzing...') 
 
 
