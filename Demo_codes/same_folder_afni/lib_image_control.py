@@ -2,7 +2,7 @@
 
 #-------------------------------------------------------------------------------------
 # Description:  This lib was to developed to provide a quality
-#                control system of image acquisition in fMRI exams.
+#               control system of image acquisition in fMRI exams.
 #
 # Author:   Maicon Diogo Much [MDM]
 #
@@ -10,6 +10,7 @@
 #
 # Revision: --/--/-- - Description/Author
 #       08/09/15 - First Release/[MDM]
+#		02/06/19 - Interface adjusts to the new version of matplotlib/[NBE]
 #-------------------------------------------------------------------------------------
 
 #Tests if libraries was installed--------------------------------------------------------------------------
@@ -51,7 +52,7 @@ import afni_util as UTIL
 
 #FONT DESCRIPTION OF PYTHON TEXT TITLE------------------------------------------------
 fonttitle = {'family' : 'sans-serif',
-        'color'  : 'black',
+        'color'  : 'blue',
         'weight' : 'bold',
         'size'   : 14,
         }
@@ -118,6 +119,8 @@ class CanvasFrame(wx.Frame):
       self.TRESHOLDRT       = 0.9
       #Number of motions that is acceptable
       self.NMotion          = 15
+      #Number of TR's to analyze
+      self.NTRstop			= 30
       #Number of TR's
       self.TRNumber         = 4
       #Number of motions in the exam
@@ -162,31 +165,23 @@ class CanvasFrame(wx.Frame):
       self.NMotionsConfig = self.AxisRT.text(-0.4, 1.32,'Head motion trend: Waiting...', fontdict=fontmediun)
       
       self.AxisRT.text(-0.1, 1.15, 'RT Head Motion', fontdict=fontmediun)
-      self.MotionLimitText = self.AxisRT.text(-0.3, 1, "- - - mm", fontdict=fontTRNumber)
+      self.MotionLimitText = self.AxisRT.text(-0.3, 1.02, "- - - mm", fontdict=fontTRNumber)
       
       self.AxisRT.text(2.8, 1.31, 'TR', fontdict=fontmediun)
       self.TRNumberText = self.AxisRT.text(3.3, 1.3, self.TRNumber, fontdict=fontTR)
 
+      # Comment the next three lines when using only the demo
       #ni.ifaddresses('eth0')
       #ip = ni.ifaddresses('eth0')[2][0]['addr']
       #print ip  # should print "192.168.100.37"
 
+      # Comment the next two lines when using this software with the MRI scanner
       ip = "localhost"
       print ip
 
       self.IP = self.AxisRT.text(2.3, 1.48, 'Running on: 192.168.1.76', fontdict=fontmediun)
       self.IP.set_text('Running on: %s' % ip)
-        
-#       #REAL TIME HEAD MOTION BAR------------------------------------------------------------
-      #self.colobarRT    = mpl.colors.ListedColormap(['c', 'y', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r'])
-      #self.normRT       = mpl.colors.Normalize(vmin=0, vmax=5.0)
-      #self.bounds       = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4.0, 4.5, 5]
-      #self.normRT       = mpl.colors.BoundaryNorm(self.bounds, self.colobarRT.N)
-      #self.bargraphRT   = mpl.colorbar.ColorbarBase(self.AxisRT, self.colobarRT,
-       #                                 self.normRT,
-       #                                 orientation='vertical')
-      #self.bargraphRT.set_label('Real Time Head Motion')
-      
+             
       #Rectangle to fill the bar------------------------------------------------------------
       self.rectangleRT    = Rectangle((0.0, 0), 1, 1, facecolor='white')
       currentAxis         = self.figure.gca()
@@ -195,18 +190,8 @@ class CanvasFrame(wx.Frame):
       #ACCUMULATIVE HEAD MOTION BAR---------------------------------------------------------
       self.AxisACC        = self.figure.add_axes([0.6, 0.05, 0.2, 0.6]) 
       
-      #self.colobarACC   = mpl.colors.ListedColormap(['c', 'y', 'r'])
-      #self.normACC      = mpl.colors.Normalize(vmin=0, vmax=25)
-      
-      #self.boundsACC    = [0, 5, 10, 15, 20, 25]
-      #self.normACC      = mpl.colors.BoundaryNorm(self.boundsACC, self.colobarACC.N)
-      #self.bargraphACC  = mpl.colorbar.ColorbarBase(self.AxisACC, cmap=self.colobarACC,
-      #                             norm=self.normACC,
-      #                             orientation='vertical')
-      #self.bargraphACC.set_label('Number of motions detected')
-      
       self.AxisACC.text(-0.1, 1.15, 'TR with motion', fontdict=fontmediun)
-      self.NMotionText = self.AxisACC.text(0.18, 1, "- - -", fontdict=fontTRNumber)
+      self.NMotionText = self.AxisACC.text(0.18, 1.02, "- - -", fontdict=fontTRNumber)
       
       #Rectangle to fill the bar------------------------------------------------------------
       self.rectangleACC    = Rectangle((0.0, 0), 1, 1, facecolor='white')
@@ -224,36 +209,42 @@ class CanvasFrame(wx.Frame):
       self.Bind(wx.EVT_TIMER, self.OnTimer)
       
       # Add a panel so it looks correct on all platforms
-      self.panel = wx.Panel(self, size=(400,400),pos=(0,0))
-      
-      self.labelInitText = wx.StaticText(self.panel, wx.ID_ANY, 'Please insert the exam info:', (85, 50), (160, -1), wx.ALIGN_CENTER)
-      font2 = wx.Font(12, wx.DECORATIVE, wx.NORMAL, wx.NORMAL)
+      self.panel = wx.Panel(self, size=(600,600),pos=(0,0))
+      self.panel.SetBackgroundColour((250,250,250))
+      self.labelInitText = wx.StaticText(self.panel, wx.ID_ANY, 'Please insert the exam info:', (57, 80), (300, 1), wx.ALIGN_CENTER)
+      font2 = wx.Font(16, wx.DECORATIVE, wx.NORMAL, wx.NORMAL)
       self.labelInitText.SetFont(font2)
       self.labelInitText.SetForegroundColour((47,79,79)) # set text color
       
-      self.TitlePanel = wx.StaticText(self.panel,-1,'fMRI Motion Viewer', (110, 10), (400, -1), wx.ALIGN_CENTER)
-      font = wx.Font(14, wx.DECORATIVE, wx.NORMAL, wx.NORMAL)
+      self.TitlePanel = wx.StaticText(self.panel,-1,'Real-time fMRI Motion Viewer', (50, 15), (400, 1), wx.ALIGN_CENTER)
+      font = wx.Font(20, wx.DECORATIVE, wx.NORMAL, wx.NORMAL)
       self.TitlePanel.SetFont(font)
-      self.TitlePanel.SetForegroundColour((0,191,255)) # set text color
+      self.TitlePanel.SetForegroundColour((0,160,255)) # set text color
       
-      self.labelInputOne = wx.StaticText(self.panel, wx.ID_ANY, 'Head Motion Limit [0 - 2.0]', (85, 80), (160, -1), wx.ALIGN_CENTER)
+      self.labelInputOne = wx.StaticText(self.panel, wx.ID_ANY, 'Head Motion Limit [0 - 2.0]', (85, 110), (160, 1), wx.ALIGN_CENTER)
       font2 = wx.Font(12, wx.DECORATIVE, wx.NORMAL, wx.NORMAL)
       self.labelInputOne.SetFont(font2)
       self.labelInputOne.SetForegroundColour((47,79,79)) # set text color
-      self.inputTxtOne = wx.TextCtrl(self.panel,wx.ID_ANY,'',pos=(85,100))
+      self.inputTxtOne = wx.TextCtrl(self.panel,wx.ID_ANY,'',pos=(85,130))
       self.inputTxtOne.WriteText('0.9')
       
-      self.labelInputTwo = wx.StaticText(self.panel, wx.ID_ANY, 'Acceptable Head Motions [0 - 20]', (85, 140), (160, -1), wx.ALIGN_CENTER)
+      self.labelInputTwo = wx.StaticText(self.panel, wx.ID_ANY, 'Acceptable Head Motions [0 - 20]', (85, 170), (160, 1), wx.ALIGN_CENTER)
       self.labelInputTwo.SetFont(font2)
       self.labelInputTwo.SetForegroundColour((47,79,79)) # set text color
-      self.inputTxtTwo = wx.TextCtrl(self.panel, wx.ID_ANY, '',pos=(85,160))
+      self.inputTxtTwo = wx.TextCtrl(self.panel, wx.ID_ANY, '',pos=(85,190))
       self.inputTxtTwo.WriteText('15')
       
-      self.labelHelp = wx.TextCtrl(parent = self.panel, id = -1, pos = (20, 210), size = (360, 100), style = wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_AUTO_URL)
+      self.labelInputThree = wx.StaticText(self.panel, wx.ID_ANY, 'Number of TRs to analyze', (85, 230), (160, 1), wx.ALIGN_CENTER)
+      self.labelInputThree.SetFont(font2)
+      self.labelInputThree.SetForegroundColour((47,79,79)) # set text color
+      self.inputTxtThree = wx.TextCtrl(self.panel, wx.ID_ANY, '', pos=(85,250))
+      self.inputTxtThree.WriteText('30')
+
+      self.labelHelp = wx.TextCtrl(parent = self.panel, id = -1, pos = (70, 310), size = (360, 100), style = wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_AUTO_URL)
       self.labelHelp.AppendText("Note: This system was developed to detect excessive head motion in fMRI exams. For this it calculates the Euclidean norm of derivative of six degrees of freedom of the head.\n")
       
-      self.okBtn = wx.Button(self.panel, wx.ID_ANY, 'Start   ',(85, 340), (60, -1), wx.ALIGN_CENTER)
-      self.cancelBtn = wx.Button(self.panel, wx.ID_ANY, 'Quit   ',(255, 340), (60, -1), wx.ALIGN_CENTER)
+      self.okBtn = wx.Button(self.panel, wx.ID_ANY, 'Start   ',(150, 400), (60, -1), wx.ALIGN_CENTER)
+      self.cancelBtn = wx.Button(self.panel, wx.ID_ANY, 'Quit   ',(280, 400), (60, -1), wx.ALIGN_CENTER)
       #self.HelpBtn = wx.Button(self.panel, wx.ID_ANY, 'Help  ',(255, 320), (60, -1), wx.ALIGN_CENTER)
       self.Bind(wx.EVT_BUTTON, self.onOK, self.okBtn)
       self.Bind(wx.EVT_BUTTON, self.onCancel, self.cancelBtn)
@@ -264,6 +255,7 @@ class CanvasFrame(wx.Frame):
    def onOK(self, event):
         self.NMotion = int(self.inputTxtTwo.GetValue())
         self.TRESHOLDRT = float(self.inputTxtOne.GetValue())
+        self.NTRstop = int(self.inputTxtThree.GetValue())
         
         if self.TRESHOLDRT == 0.1:
            self.colobarRT    = mpl.colors.ListedColormap(['r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r'])
@@ -371,9 +363,6 @@ class CanvasFrame(wx.Frame):
         #N-MOTIONS TRESHOLD-------------------------------------------------------------------
         self.pointsACC = np.ones(5)
         self.AxisACC.plot((self.NMotion/20.0) * self.pointsACC, linestyle='-', color='blue', linewidth=3)
-        
-        #self.MotionConfig.set_text('Head Motion Limit: %2.1f' % float(self.inputTxtOne.GetValue()))
-        #self.NMotionsConfig.set_text('Acceptable Head Motions: %d' % int(self.inputTxtTwo.GetValue()))
              
         #Treshold configured to RT Motion bar-------------------------------------------------
         self.points       = np.ones(5)
@@ -442,12 +431,9 @@ class CanvasFrame(wx.Frame):
          if self.ACCmotionstatus < 26:
              self.rectangleACC.set_y(self.ACCmotionstatus/20.0)
              
-             if self.ACCmotionstatus >= self.NMotion and self.TRNumber <= 30:
+             if self.ACCmotionstatus >= self.NMotion and self.TRNumber <= self.NTRstop:
                  self.MotionDetected = 1
-
-      #else: 
-      #   self.textExcessive.set_visible(False)
-         
+    
       self.canvas.draw()
 
    def exit(self):
@@ -469,11 +455,11 @@ class CanvasFrame(wx.Frame):
           print '-- Euclidean Motion: %f' % self.adata.mat[0][1]
           self.plot_data(self.eucMotion)
 
-      if self.TRNumber == 30 and self.ACCmotionstatus < self.NMotion:
+      if self.TRNumber == self.NTRstop and self.ACCmotionstatus < self.NMotion:
          self.NMotionsConfig.set_text('Head motion trend: PASS')
-      elif self.TRNumber <= 30 and self.ACCmotionstatus > self.NMotion:
+      elif self.TRNumber <= self.NTRstop and self.ACCmotionstatus > self.NMotion:
          self.NMotionsConfig.set_text('Head motion trend: FAIL')
-      elif self.TRNumber < 30:
+      elif self.TRNumber < self.NTRstop:
          self.NMotionsConfig.set_text('Head motion trend: Analyzing...') 
 
 
@@ -488,13 +474,8 @@ class CanvasFrame(wx.Frame):
          self.NMotionsConfig.set_text('Head motion trend: Waiting...')
 
       if self.MotionDetected == 1:
-          #self.counter += 1
-          #if self.counter < 10:
-              self.textExcessive.set_visible(True)
-          #elif self.counter < 20:
-          #    self.textExcessive.set_visible(False)
-          #else:
-          #    self.counter = 0           
+         self.textExcessive.set_visible(True)
+          
 def main():
 
     wx_app = wx.App()

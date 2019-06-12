@@ -132,77 +132,73 @@ else
 if ( ! ($?RESONANCE_COMPUTER) ) then	#set base dir in Resonance computer and in another computer	
 		
 	if ( ! ($?ORDER_BY_SUFFIX) ) then	#Dicom order by suffix		
-	Dimon 	-rt 										\
-		-infile_pattern ''$PATIENTDIR'/*.dcm'						\
-		#-infile_prefix $PATIENTDIR/i 							\
-		-host $RTFMRI_AFNI_HOST 							\
-		-pause 2000 									\
-		-tr $TR_TIME 									\
-		-dicom_org 									\
-		-num_slices $NUMBER_OF_SLICES							\
-		-nt $VOLUMES_PER_RUN 								\
-		#-rt_cmd 'XYZAXES S-I A-P L-R'	        					\
-		-rt_cmd 'GRAPH_XRANGE '$VOLUMES_PER_RUN''	        			\
-		#-rt_cmd 'GRAPH_EXPR sqrt(d*d+e*e+f*f)'						\
-		-rt_cmd 'NAME '$FMRI_SESSION''	        					\
-		-drive_wait 'OPEN_WINDOW axialimage geom=400x300+890+47' 	 		\
+	Dimon 	-rt 																\
+		-infile_pattern ''$PATIENTDIR'/*'										\
+		-host $RTFMRI_AFNI_HOST 												\
+		-pause 1000 															\
+		-tr $TR_TIME 															\
+		-dicom_org 																\
+		-num_slices $NUMBER_OF_SLICES											\
+		-nt $VOLUMES_PER_RUN 													\
+		-rt_cmd 'GRAPH_XRANGE '$VOLUMES_PER_RUN''	        					\
+		-rt_cmd 'NAME '$FMRI_SESSION''	        								\
+		-drive_wait 'OPEN_WINDOW axialimage geom=400x300+890+47' 	 			\
 		-drive_afni 'OPEN_WINDOW axialgraph pinnum='$VOLUMES_PER_RUN'' 			\
-		-drive_afni 'SET_SUBBRICKS 0 1 1'	          				\
-		-drive_afni 'SET_DICOM_XYZ 152 20 37'               				\
-		-drive_afni 'SET_FUNC_RANGE 0'                  				\
-		-drive_afni 'SET_THRESHNEW 0.4'                   				\
-		-max_quiet_trs 3								\
-		-debug 3									\
-		-sleep_frac 0.4									\
-		-sleep_init 3000								\
-		-sort_by_acq_time								\
+		-drive_afni 'SET_SUBBRICKS 0 1 1'	          							\
+		-drive_afni 'SET_DICOM_XYZ 152 20 37'               					\
+		-drive_afni 'SET_FUNC_RANGE 0'                  						\
+		-drive_afni 'SET_THRESHNEW 0.4'                   						\
+		-max_quiet_trs 3														\
+		-debug 3																\
+		-sleep_frac 0.4															\
+		-sleep_init 3000														\
+		-sort_by_acq_time														\
 		-quit
 	else
-	Dimon 	-rt 										\		
-		-infile_prefix $PATIENTDIR/i 							\
-		-host $RTFMRI_AFNI_HOST 							\
-		-pause 500 									\
-		-tr $TR_TIME 									\
-		-dicom_org 									\
-		-num_slices $NUMBER_OF_SLICES							\
-		-nt $VOLUMES_PER_RUN 								\
-		-rt_cmd 'GRAPH_XRANGE '$VOLUMES_PER_RUN''	        			\
-		#-rt_cmd 'GRAPH_EXPR sqrt(d*d+e*e+f*f)'						\
-		-rt_cmd 'NAME '$FMRI_SESSION''	        					\
-		-drive_wait 'OPEN_WINDOW axialimage geom=400x300+890+47' 	 		\
+	Dimon 	-rt 																\
+		-infile_prefix $PATIENTDIR/* 											\
+		-host $RTFMRI_AFNI_HOST 												\
+		-pause 500 																\
+		-tr $TR_TIME 															\
+		-dicom_org 																\
+		-num_slices $NUMBER_OF_SLICES											\
+		-nt $VOLUMES_PER_RUN 													\
+		-rt_cmd 'GRAPH_XRANGE '$VOLUMES_PER_RUN''	        					\
+		-rt_cmd 'NAME '$FMRI_SESSION''	        								\
+		-drive_wait 'OPEN_WINDOW axialimage geom=400x300+890+47' 	 			\
 		-drive_afni 'OPEN_WINDOW axialgraph pinnum='$VOLUMES_PER_RUN'' 			\
-		-drive_afni 'SET_SUBBRICKS 0 1 1'	          				\
-		-drive_afni 'SET_DICOM_XYZ 152 20 37'               				\
-		-drive_afni 'SET_FUNC_RANGE 0'                  				\
-		-drive_afni 'SET_THRESHNEW 0.4'                   				\
-		-max_quiet_trs 3								\
-		-sleep_frac 0.4									\
-		-sleep_init 3000								\
-		-sort_method num_suffix								\
+		-drive_afni 'SET_SUBBRICKS 0 1 1'	          							\
+		-drive_afni 'SET_DICOM_XYZ 152 20 37'               					\
+		-drive_afni 'SET_FUNC_RANGE 0'                  						\
+		-drive_afni 'SET_THRESHNEW 0.4'                   						\
+		-max_quiet_trs 3														\
+		-sleep_frac 0.4															\
+		-sleep_init 3000														\
+		-sort_method num_suffix													\
 		-quit
 	endif 
 
 else
 
-	Dimon 	-rt 										\
-		-infile_prefix $PATIENTDIR/i 							\
-		-host $RTFMRI_AFNI_HOST 							\
-		-tr $TR_TIME 									\
-		-nt $VOLUMES_PER_RUN 								\
-		-rt_cmd 'GRAPH_XRANGE '$VOLUMES_PER_RUN''	        			\
-		-num_slices $NUMBER_OF_SLICES							\
-		-rt_cmd 'GRAPH_EXPR '(a+b+c)/3''	        				\
-		-rt_cmd 'NAME '$FMRI_SESSION''	        					\
-		-drive_wait 'OPEN_WINDOW axialimage geom=400x300+890+47' 	 		\
-		-drive_wait 'OPEN_WINDOW axialgraph pinnum='$VOLUMES_PER_RUN'' 			\		
-		-drive_afni 'SET_SUBBRICKS 0 1 1'	          				\
-		-drive_afni 'SET_DICOM_XYZ 152 4 12'               				\
-		-drive_afni 'SET_FUNC_RANGE 0'                  				\
-		-drive_afni 'SET_THRESHNEW 0.4'                   				\
-		-max_quiet_trs 3								\
-		-sleep_frac 0.4									\
-		-sleep_init 3000								\
-		-sort_method num_suffix								\
+	Dimon 	-rt 																\
+		-infile_prefix $PATIENTDIR/* 											\
+		-host $RTFMRI_AFNI_HOST 												\
+		-tr $TR_TIME 															\
+		-nt $VOLUMES_PER_RUN 													\
+		-rt_cmd 'GRAPH_XRANGE '$VOLUMES_PER_RUN''	        					\
+		-num_slices $NUMBER_OF_SLICES											\
+		-rt_cmd 'GRAPH_EXPR '(a+b+c)/3''	        							\
+		-rt_cmd 'NAME '$FMRI_SESSION''	        								\
+		-drive_wait 'OPEN_WINDOW axialimage geom=400x300+890+47' 	 			\
+		-drive_wait 'OPEN_WINDOW axialgraph pinnum='$VOLUMES_PER_RUN'' 			\
+		-drive_afni 'SET_SUBBRICKS 0 1 1'	          							\
+		-drive_afni 'SET_DICOM_XYZ 152 4 12'               						\
+		-drive_afni 'SET_FUNC_RANGE 0'                  						\
+		-drive_afni 'SET_THRESHNEW 0.4'                   						\
+		-max_quiet_trs 3														\
+		-sleep_frac 0.4															\
+		-sleep_init 1000														\
+		-sort_method num_suffix													\
 		-quit
 
 endif				 	
