@@ -1,0 +1,8 @@
+required python modules: matlplotlib, netifaces, wxPython, numpy, Pillow
+
+In .bashrc, add afnipy, afni to $PYTHONPATH
+
+
+lib_image_control.py: before line 22, add     import sys
+
+
